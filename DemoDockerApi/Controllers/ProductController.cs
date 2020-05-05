@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DemoDockerApi.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,19 +12,34 @@ namespace DemoDockerApi.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<Product>> Get()
+        private readonly IProductRepository _productRepository;
+        public ProductController(IProductRepository productRepository)
         {
-            List<Product> lst = new List<Product>();
-            for (int i = 0; i < 3; i++)
+            _productRepository = productRepository;
+        }
+        [HttpGet]
+        public async Task <ActionResult<List<Product>>> Get()
+        {
             {
-                Product obj = new Product();
-                obj.Id = i;
-                obj.Name = "sagar" + i;
-                obj.Price = i + 10 * 2;
-                lst.Add(obj);
+                try
+                {
+                    //var result = new List<Product>();
+                    //for (int i = 0; i < 5; i++)
+                    //{
+                    //    Product obj = new Product();
+                    //    obj.Id = i;
+                    //    obj.Name = "sagar";
+                    //    obj.Price = i;
+                    //    result.Add(obj);
+                    //}
+                    var result = await _productRepository.GetProducts();
+                    return Ok(result);
+                }
+                catch (Exception ex)
+                {
+                    return NotFound(ex.Message);
+                }
             }
-            return Ok(lst);
         }
     }
 }
